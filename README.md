@@ -3,7 +3,7 @@ Official Repository for paper "Ontology-Free General-Domain Knowledge Graph-to-T
 
 ## Install
 
-To use this repository, you must download the provided ```QuestEval``` directory. This directory contains modifications to the official QuestEval repository. These modifications are necessary for the specific analyses performed in this project, so please ensure you use the provided version.
+To use this repository, you must download the provided [QuestEval](./QuestEval/) directory. This directory contains modifications to the official QuestEval repository. These modifications are necessary for the specific analyses performed in this project, so please ensure you use the provided version.
 
 ```bash
 git clone https://github.com/daehuikim/WikiOFGraph.git
@@ -21,7 +21,7 @@ from datasets import load_dataset
 dataset = load_dataset("andreaKIM/WikiOFGraph")
 ```
 
-## process
+## Main Methods
 This repository includes code to generate the WikiOFGraph, as described in the paper. 
 
 The process involves several steps, such as data pre-processing, graph extraction, and Data-QuestEval Filtering. 
@@ -32,5 +32,5 @@ Detailed implementations are provided in the [process](./process/README.md).
 
 This directory contains the details of qualitative analysis described in the paper. 
 
-Detailed analysis scripts and example outputs are provided in the [qualitative_analysis](./QualitativeAnalysis/README.md).
+Detailed analysis scripts and example outputs are provided in the [QualitativeAnalysis](./QualitativeAnalysis/README.md).
 

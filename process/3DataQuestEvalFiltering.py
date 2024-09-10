@@ -1,5 +1,5 @@
+import argparse
 import json
-import random
 from questeval.questeval_metric import QuestEval
 
 class DataQuestEvalFilter:
@@ -17,7 +17,7 @@ class DataQuestEvalFilter:
             result.append([values[0].strip('<S> ').strip(), values[1].strip('<P> ').strip(), values[2].strip('<O> ').strip()])
         return result
 
-    def valid_f1(self, annotation, table):
+    def data_questeval_scoring(self, annotation, table):
         score = self.questeval.corpus_questeval(
             hypothesis=[annotation],
             sources=[table]
@@ -25,8 +25,10 @@ class DataQuestEvalFilter:
         return score['corpus_score'] >= 0.3
 
     def list2rdf(self, triplet):
-        triples = [f"(<S> {items[0]}| <P> {items[1]}| <O> {items[2]})" for items in triplet]
-        random.shuffle(triples)
+        triples = []
+        for items in triplet:
+            items_str = items.split(' | ')
+            triples.append(f"(<S> {items_str[0]}| <P> {items_str[1]}| <O> {items_str[2]})")
         return ', '.join(triples)
 
     def load_data(self):
@@ -38,9 +40,8 @@ class DataQuestEvalFilter:
 
     def extract_results(self):
         self.results = []
-        for i, line in enumerate(self.lines):
-            if "Filtering result is" in line and i + 1 < len(self.lines):
-                self.results.append(self.lines[i + 1].strip())
+        for line in self.lines:
+            self.results.append(line.strip())
 
     def filter_results(self):
         self.result_filtered = []
@@ -59,7 +60,7 @@ class DataQuestEvalFilter:
         self.final_results = [
             (text, self.list2rdf(triplets))
             for text, triplets in zip(self.result_filtered, self.triplet_for_result)
-            if self.valid_f1(text, triplets)
+            if self.data_questeval_scoring(text, triplets)
         ]
 
     def save_results(self):
@@ -69,15 +70,19 @@ class DataQuestEvalFilter:
                 f.write('\n')
 
 def main():
-    source_text_path = "YOUR_SOURCE_TEXT_PATH"
-    extracted_graph_path = "YOUR_EXTRACTED_GRAPH_PATH"
-    save_path = "YOUR_SAVE_PATH"
+    parser = argparse.ArgumentParser(description="Filter data using QuestEval and save results.")
+    
+    parser.add_argument('--source_text_path', type=str, required=True, help='Path to the source text file.')
+    parser.add_argument('--extracted_graph_path', type=str, required=True, help='Path to the extracted graph data file.')
+    parser.add_argument('--save_path', type=str, required=True, help='Path to save the filtered results.')
+
+    args = parser.parse_args()
 
     evaluator = DataQuestEvalFilter(
         questeval_task="data2text",
-        source_text_path=source_text_path,
-        extracted_graph_path=extracted_graph_path,
-        save_path=save_path
+        source_text_path=args.source_text_path,
+        extracted_graph_path=args.extracted_graph_path,
+        save_path=args.save_path
     )
 
     evaluator.load_data()

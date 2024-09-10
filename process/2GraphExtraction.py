@@ -1,5 +1,6 @@
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
+import argparse
 
 class GraphExtractor:
     def __init__(self, model_name, quantization, dtype, trust_remote_code, tensor_parallel_size, temperature, top_p, max_tokens):
@@ -23,7 +24,7 @@ class GraphExtractor:
         return prompts
 
     def prepare_prompts_for_chat(self, prompts):
-        prompts_dict = [{"role": "user", "content": prompt} for prompt in prompts]
+        prompts_dict = [[{"role": "user", "content": prompt}] for prompt in prompts]
         prompts_chat_applied = [self.tokenizer.apply_chat_template(prompt_dict, tokenize=False, add_generation_prompt=True) for prompt_dict in prompts_dict]
         return prompts_chat_applied
 
@@ -40,9 +41,26 @@ class GraphExtractor:
                 f.write(text + '\n')
 
 def main():
-    input_data_path = "YOUR_INPUT_PATH"
-    save_path = "YOUR_SAVE_PATH"
-    intended_number = 100_000
+    parser = argparse.ArgumentParser(description="Generate triplets from text using a pretrained model.")
+    
+    # Add arguments for file paths, number of samples, and model parameters
+    parser.add_argument('--input_data_path', type=str, required=True, help='Path to the input text file.')
+    parser.add_argument('--save_path', type=str, required=True, help='Path to save the generated triplets.')
+    parser.add_argument('--intended_number', type=int, required=True, help='Number of triplets to generate.')
+    
+    # Model parameters
+    parser.add_argument('--model_name', type=str, default="casperhansen/llama-3-70b-instruct-awq", help='Model name for the LLM.')
+    parser.add_argument('--quantization', type=str, default="AWQ", help='Quantization type.')
+    parser.add_argument('--dtype', type=str, default="auto", help='Data type for the model.')
+    parser.add_argument('--trust_remote_code', type=str, default="True", help='Whether to trust remote code for the model.')
+    parser.add_argument('--tensor_parallel_size', type=int, default=4, help='Tensor parallel size for the model.')
+    
+    # Sampling parameters
+    parser.add_argument('--temperature', type=float, default=0.5, help='Temperature for sampling.')
+    parser.add_argument('--top_p', type=float, default=0.9, help='Top-p sampling parameter.')
+    parser.add_argument('--max_tokens', type=int, default=256, help='Maximum number of tokens to generate.')
+
+    args = parser.parse_args()
 
     instruction="""Your task is to create a set of triplets that can represent all the entities that appear in the given text.
     Triplet is consist of three parts (<S>, <P>, <O>)
@@ -66,22 +84,24 @@ def main():
     [TEXT]: {text}
     [TRIPLET]:"""
 
-    with open(input_data_path, 'r') as f:
+    # Read input text file
+    with open(args.input_data_path, 'r') as f:
         text_data = f.readlines()
 
+    # Create an instance of GraphExtractor with user-provided model parameters
     graph_extractor = GraphExtractor(
-        model_name="casperhansen/llama-3-70b-instruct-awq", 
-        quantization="AWQ",
-        dtype="auto",
-        trust_remote_code="True",
-        tensor_parallel_size=4,
-        temperature=0.5,
-        top_p=0.9,
-        max_tokens=256
+        model_name=args.model_name,
+        quantization=args.quantization,
+        dtype=args.dtype,
+        trust_remote_code=args.trust_remote_code,
+        tensor_parallel_size=args.tensor_parallel_size,
+        temperature=args.temperature,
+        top_p=args.top_p,
+        max_tokens=args.max_tokens
     )
 
-    generated_texts = graph_extractor.generate_triplets(text_data, intended_number, instruction)
-    graph_extractor.save_results(generated_texts, save_path)
+    generated_texts = graph_extractor.generate_triplets(text_data, args.intended_number, instruction)
+    graph_extractor.save_results(generated_texts, args.save_path)
 
 if __name__ == '__main__':
     main()
