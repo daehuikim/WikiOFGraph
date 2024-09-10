@@ -8,7 +8,9 @@ To use this repository, you must download the provided [QuestEval](./QuestEval/)
 ```bash
 git clone https://github.com/daehuikim/WikiOFGraph.git
 cd WikiOFGraph
-to be added
+pip install transformers, vllm, openai, datasets
+cd qeval
+pip install -e .
 ```
 
 ## Data
@@ -34,3 +36,8 @@ This directory contains the details of qualitative analysis described in the pap
 
 Detailed analysis scripts and example outputs are provided in the [QualitativeAnalysis](./QualitativeAnalysis/README.md).
 
+## Experiments
+
+Detailed codes related to experiments are in the [experiments](./experiments/README.md).
+
+Trainner and inference codes are implemented using [transformers](https://github.com/huggingface/transformers).
