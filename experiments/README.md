@@ -61,4 +61,4 @@ wikiofgraph_test # Results of WikiOFGraph test file (Table3)
 ```
 Source for evaluation and reproduce are provided in ```source``` directory.
 
-```c#_n@g-genwiki.txt``` means the ratio of "curated" samples and "noise" samples are #:@.
+```c#_n@g-genwiki.txt``` means the ratio of "curated" samples and "noise" samples are ```#:@```.
