@@ -14,17 +14,7 @@ pip install -e .
 ```
 
 ## Data
-The data used in this project is provided via the [Huggingface datasets](https://huggingface.co/datasets/andreaKIM/WikiOFGraph). 
-You can download and prepare the dataset by running the following:
-
-```
-from datasets import load_dataset
-
-dataset = load_dataset("andreaKIM/WikiOFGraph")
-```
-or
-
-you can manually download files from this link.
+You can manually download files from this link.
 
 [Download link](https://drive.google.com/drive/folders/1FaEdfgmcjHixVacdZLFCus6HO-k2yrR5?usp=sharing)
 
